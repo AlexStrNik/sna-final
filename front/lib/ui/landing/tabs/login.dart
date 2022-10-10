@@ -1,6 +1,8 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:front/ui/common/on_drag_widget.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LoginTab extends StatelessWidget {
   const LoginTab({Key? key}) : super(key: key);
@@ -9,7 +11,9 @@ class LoginTab extends StatelessWidget {
     return Stack(
       alignment: AlignmentDirectional.topCenter,
       children: [
-        Center(
+        Padding(
+          padding:
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.43),
           child: Container(
             decoration: BoxDecoration(
                 color: Theme.of(context).primaryColor.withOpacity(0.2),
@@ -20,67 +24,88 @@ class LoginTab extends StatelessWidget {
         ),
         Padding(
           padding:
-              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.30),
-          child: OnDragWidget(),
+              EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.40),
+          child: const OnDragWidget(),
         ),
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
             text: '\nautomate merge, deploy and release routine operations'
                 .toUpperCase(),
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Colors.indigo),
+            style: GoogleFonts.overpass(
+                textStyle: Theme.of(context).textTheme.bodyLarge,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Colors.indigo),
             children: [
               TextSpan(
                 text: '\nYour DevOps Team ',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w900, color: Colors.black),
+                style: GoogleFonts.overpass(
+                    textStyle: Theme.of(context).textTheme.headlineLarge,
+                    fontSize: 64,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black),
               ),
               const WidgetSpan(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 4.0),
+                  padding: EdgeInsets.only(bottom: 16.0),
                   child: Icon(
                     Icons.assignment_ind_rounded,
-                    size: 36.0,
+                    size: 56.0,
                     color: Colors.blueAccent,
                   ),
                 ),
               ),
               TextSpan(
                 text: ' Assistant,',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w900, color: Colors.black),
+                style: GoogleFonts.overpass(
+                    textStyle: Theme.of(context).textTheme.headlineLarge,
+                    fontSize: 64,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black),
               ),
               TextSpan(
                 text: '\nbut it ',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w900, color: Colors.black),
+                style: GoogleFonts.overpass(
+                    textStyle: Theme.of(context).textTheme.headlineLarge,
+                    fontSize: 64,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black),
               ),
               const WidgetSpan(
                 child: Padding(
-                  padding: EdgeInsets.only(bottom: 4.0),
+                  padding: EdgeInsets.only(bottom: 16.0),
                   child: Icon(
                     Icons.flash_on_rounded,
-                    size: 32.0,
+                    size: 56.0,
                     color: Colors.blueAccent,
                   ),
                 ),
               ),
               TextSpan(
-                text: ' actually works.\n\n',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w900, color: Colors.black),
+                text: ' actually works.\n',
+                style: GoogleFonts.arvo(
+                    textStyle: Theme.of(context).textTheme.headlineLarge,
+                    fontSize: 64,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black),
               ),
               TextSpan(
                 text: 'Say  ',
-                style: Theme.of(context).textTheme.bodyLarge,
+                style: GoogleFonts.overpass(
+                    textStyle: Theme.of(context).textTheme.bodyLarge,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black),
               ),
               WidgetSpan(
                 child: DefaultTextStyle(
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      backgroundColor: Colors.black, color: Colors.white),
+                  style: GoogleFonts.overpass(
+                      textStyle: Theme.of(context).textTheme.bodyLarge,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      backgroundColor: Colors.black,
+                      color: Colors.white),
                   child: AnimatedTextKit(
                       isRepeatingAnimation: true,
                       animatedTexts: [
@@ -92,8 +117,13 @@ class LoginTab extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                  text: ' in a Github issue and start from there.',
-                  style: Theme.of(context).textTheme.bodyLarge),
+                text: ' in a Github issue and start from there.',
+                style: GoogleFonts.overpass(
+                    textStyle: Theme.of(context).textTheme.bodyLarge,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black),
+              ),
             ],
           ),
         )

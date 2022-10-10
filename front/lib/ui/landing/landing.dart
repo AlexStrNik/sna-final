@@ -101,7 +101,7 @@ class _LandingScreenState extends State<LandingScreen>
                 ),
               ),
               const Spacer(),
-              TextButton(
+              OutlinedButton(
                 onPressed: () async => await Utils.launchDocs(),
                 child: Text(
                   'Login via Github',
@@ -118,11 +118,11 @@ class _LandingScreenState extends State<LandingScreen>
             height: MediaQuery.of(context).size.height,
             child: TabBarView(
               controller: _controller,
-              children: const [
-                LoginTab(),
+              children: [
+                const LoginTab(),
                 FAQTab(),
-                IntegrationTab(),
-                WhyTab(),
+                const IntegrationTab(),
+                const WhyTab(),
               ],
             ),
           ),

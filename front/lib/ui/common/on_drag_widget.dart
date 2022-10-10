@@ -1,18 +1,27 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:front/providers/auth_provider.dart';
 import 'package:front/ui/common/landing_custom_btn.dart';
 import 'package:front/ui/common/on_tap_animation.dart';
 import 'package:front/constants/utils.dart';
+import 'package:flutter_web_auth/flutter_web_auth.dart';
 
-class OnDragWidget extends StatefulWidget {
+import 'dart:convert' show jsonDecode;
+import 'package:http/http.dart' as http;
+
+class OnDragWidget extends ConsumerStatefulWidget {
   const OnDragWidget({
     super.key,
   });
 
   @override
-  State<OnDragWidget> createState() => _OnDragWidgetState();
+  _OnDragWidgetState createState() => _OnDragWidgetState();
 }
 
-class _OnDragWidgetState extends State<OnDragWidget> {
+class _OnDragWidgetState extends ConsumerState<OnDragWidget> {
   bool amIHovering = false;
   int _enterCounter = 0;
   int _exitCounter = 0;
@@ -42,9 +51,11 @@ class _OnDragWidgetState extends State<OnDragWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+
     return ConstrainedBox(
       constraints: BoxConstraints.tight(
-          Size(MediaQuery.of(context).size.width * 0.408, 70)),
+          Size(MediaQuery.of(context).size.width * 0.38, 70)),
       child: MouseRegion(
         onEnter: _incrementEnter,
         onHover: _updateLocation,
@@ -52,18 +63,19 @@ class _OnDragWidgetState extends State<OnDragWidget> {
         child: Stack(
           children: [
             Container(
-              height: 55,
+              height: 90,
               decoration: BoxDecoration(
                 color: amIHovering
                     ? Theme.of(context).primaryColor.withOpacity(0.1)
                     : Colors.transparent,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16.0),
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(16.0),
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 6.0, left: 6.0),
+              padding: const EdgeInsets.only(
+                  top: 6.0, left: 8.0, right: 8.0, bottom: 6.0),
               child: Container(
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -100,7 +112,7 @@ class _OnDragWidgetState extends State<OnDragWidget> {
                       height: 200,
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: OnTapOpacityContainer(
-                        onTap: () async => await Utils.launchDocs(),
+                        onTap: () async => auth.proceedOAuth(),
                         curve: Curves.ease,
                         child: ClipPath(
                           clipper: BackgroundClipper(),
