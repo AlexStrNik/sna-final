@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class OnTapOpacityContainer extends StatefulWidget {
   const OnTapOpacityContainer({
     required this.child,
-    required this.curve,
+    this.curve = Curves.ease,
     Key? key,
     this.duration = const Duration(milliseconds: 200),
     this.onTapOpacity = 0.4,

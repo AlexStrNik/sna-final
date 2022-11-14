@@ -26,7 +26,7 @@ class WhyTab extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.only(bottom: 4.0),
                   child: Icon(
-                    Icons.block_rounded,
+                    Icons.thumb_down_alt_rounded,
                     size: 32.0,
                     color: Colors.redAccent,
                   ),
