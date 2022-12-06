@@ -1,0 +1,16 @@
+name: "html-differ"
+image: "node:19"
+jobs:
+  clone:
+    steps:
+      - git clone https://github.com/bem/html-differ
+      - cd html-differ
+      - npm i
+    artifacts:
+      - html-differ
+  test:
+    steps:
+      - cd html-differ
+      - npm run test
+    depends-on:
+      - clone
