@@ -5,6 +5,7 @@ from .constants import SESSION_SECRET
 from .routers import auth, api, webhook
 from .database import Base, engine
 from .runner.runner import check_waiting_runs
+from .runner.utils import build_checkouter
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
@@ -14,6 +15,7 @@ app.include_router(webhook.router)
 
 Base.metadata.create_all(bind=engine)
 
+build_checkouter()
 check_waiting_runs()
 
 @app.get('/')
