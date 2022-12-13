@@ -4,9 +4,10 @@ from pydantic import BaseModel
 
 
 class StageStatus(str, Enum):
-    Waiting = 'waiting',
-    Running = 'running',
-    Failed = 'failed',
+    Ready = 'ready'
+    Waiting = 'waiting'
+    Running = 'running'
+    Failed = 'failed'
     Success = 'success'
 
 
@@ -17,7 +18,8 @@ class Stage(BaseModel):
 
 class StageIn(Stage):
     run_id: str
-    waiting_for: int
+    next_stage: int
+    status: Optional[StageStatus]
     image_tag: str
     env_vars: Mapping[str, str]
     pass

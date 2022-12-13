@@ -14,3 +14,6 @@ def add_stage(db: Session, stage: StageIn):
 
     return db_stage
 
+def get_next_stage(db: Session):
+    # db_stage
+    pass

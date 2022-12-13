@@ -5,7 +5,7 @@ from io import BytesIO
 from docker.errors import ImageNotFound
 
 from ..constants import RUNNER_CHECKOUTER_TAG, RUNNER_TAG_PREFIX, RUNNER_CLEANUP_TAG
-from ..schemas.stage import StageIn, StageOut
+from ..schemas.stage import StageIn, StageOut, StageStatus
 from ..crud.stage import add_stage
 from ..schemas import config
 from ..models.run import Run
@@ -52,38 +52,38 @@ def build_worker(run: Run, build_finished):
     config_raw = requests.get(run.config_url, headers={ 'Authorization': f'Bearer {run.token}' }).text
     config = parse_config(config_raw)
 
-    waiting_for = -1
-    checkout_stage = add_stage_(StageIn(
+    cleanup_stage = add_stage_(StageIn(
         run_id=run.id,
-        waiting_for=waiting_for,
+        next_stage=-1,
+        name='cleanup',
+        image_tag=RUNNER_CLEANUP_TAG,
+        env_vars={}
+    ))
+    next_stage = cleanup_stage.id
+
+    for stage_name, stage in list(config.stages.items())[::-1]:
+        stage_tag = build_stage(stage_name, stage, config.image)
+
+        stage = add_stage_(StageIn(
+            run_id=run.id,
+            next_stage=next_stage,
+            name=stage_name,
+            image_tag=stage_tag,
+            env_vars={},
+            artifacts=stage.artifacts
+        ))
+        next_stage = stage.id
+
+    add_stage_(StageIn(
+        run_id=run.id,
+        next_stage=next_stage,
+        status=StageStatus.Ready,
         name='checkout',
         image_tag=RUNNER_CHECKOUTER_TAG,
         env_vars={
             'REPO_URL': run.clone_url,
             'COMMIT_ID': run.commit_id
         },
-    ))
-    waiting_for = checkout_stage.id
-
-    for stage_name, stage in config.stages.items():
-        stage_tag = build_stage(stage_name, stage, config.image)
-
-        stage = add_stage_(StageIn(
-            run_id=run.id,
-            waiting_for=waiting_for,
-            name=stage_name,
-            image_tag=stage_tag,
-            env_vars={},
-            artifacts=stage.artifacts
-        ))
-        waiting_for = stage.id
-
-    add_stage_(StageIn(
-        run_id=run.id,
-        waiting_for=waiting_for,
-        name='cleanup',
-        image_tag=RUNNER_CLEANUP_TAG,
-        env_vars={}
     ))
     
     build_finished()
