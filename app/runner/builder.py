@@ -52,8 +52,10 @@ def build_worker(run: Run, build_finished):
     config_raw = requests.get(run.config_url, headers={ 'Authorization': f'Bearer {run.token}' }).text
     config = parse_config(config_raw)
 
+    stage_order = 1
     cleanup_stage = add_stage_(StageIn(
         run_id=run.id,
+        order=len(config.stages.keys()) + 1,
         next_stage=-1,
         name='cleanup',
         image_tag=RUNNER_CLEANUP_TAG,
@@ -66,6 +68,7 @@ def build_worker(run: Run, build_finished):
 
         stage = add_stage_(StageIn(
             run_id=run.id,
+            order=stage_order,
             next_stage=next_stage,
             name=stage_name,
             image_tag=stage_tag,
@@ -73,9 +76,11 @@ def build_worker(run: Run, build_finished):
             artifacts=stage.artifacts
         ))
         next_stage = stage.id
+        stage_order += 1
 
     add_stage_(StageIn(
         run_id=run.id,
+        order=0,
         next_stage=next_stage,
         status=StageStatus.Ready,
         name='checkout',

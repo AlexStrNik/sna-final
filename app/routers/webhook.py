@@ -7,7 +7,7 @@ from ..schemas.run import RunIn
 from ..crud.run import add_run
 from ..schemas.webhook_event import EventPushed
 from ..runner.utils import parse_config
-from ..runner.runner import start_builder
+from ..runner.external import start_builder
 from ..dependencies import get_db
 
 router = APIRouter()

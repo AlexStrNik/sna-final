@@ -8,6 +8,7 @@ class Stage(Base):
     __tablename__ = 'stages'
 
     id = Column(Integer, primary_key=True, index=True)
+    order = Column(Integer)
     run_id = Column(Integer)
     name = Column(String)
     status = Column(Enum(StageStatus), default=StageStatus.Waiting)

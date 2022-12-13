@@ -17,8 +17,9 @@ class Stage(BaseModel):
 
 
 class StageIn(Stage):
-    run_id: str
     next_stage: int
+    order: int
+    run_id: int
     status: Optional[StageStatus]
     image_tag: str
     env_vars: Mapping[str, str]
@@ -31,3 +32,6 @@ class StageOut(Stage):
 
     class Config:
         orm_mode = True
+
+class StageInternal(StageIn, StageOut):
+    pass
