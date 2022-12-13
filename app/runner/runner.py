@@ -9,21 +9,20 @@ from .docker_client import docker_client
 
 def run_worker(stage: StageInternal, run_finished):
     run_dir = path.join(os.getcwd(), RUNNER_TMP_DIR, stage.run_id)
-    volume_dir = path.join(run_dir, 'volume')
-    log_path = path.join(run_dir, RUNNER_LOGS_DIR, stage.run_id, f'{stage.name}.log')
+    log_path = path.join(os.getcwd(), RUNNER_LOGS_DIR, stage.run_id, f'{stage.name}.log')
 
     if stage.image_tag == RUNNER_CLEANUP_TAG:
         # todo
         return
 
     if stage.image_tag == RUNNER_CHECKOUTER_TAG:
-        os.makedirs(volume_dir)
+        os.makedirs(run_dir)
         pass
 
     container = docker_client.containers.run(
         stage.image_tag,
         detach=True,
-        volumes={ volume_dir: { 'bind': f'/sources', 'mode': 'rw' } }
+        volumes={ run_dir: { 'bind': f'/sources', 'mode': 'rw' } }
     )
 
     with open(log_path) as log:
