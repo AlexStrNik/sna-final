@@ -37,7 +37,7 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
     try:
         config = parse_config(config.text)
     except Exception as full_detail:
-        raise HTTPException(status_code=400, detail=f'skipping event, validation failed', full_detail=full_detail)
+        raise HTTPException(status_code=400, detail=f'skipping event, validation failed. {full_detail}')
 
     if branch_name not in config.branches:
         raise HTTPException(status_code=400, detail=f'skipping event, branch {branch_name} not listed in config')
