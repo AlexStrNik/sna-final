@@ -5,21 +5,24 @@ from starlette.requests import Request
 
 from ..dependencies import user_from_session, get_db
 from ..schemas.user import User, UserOut
-from ..schemas.repo import RepoOut
+from ..schemas.repo import RepoIn, RepoOut
+from ..schemas.run import RunOut
 from ..crud.webhook import get_webhooks, add_webhook
+from ..crud.run import get_runs
+from ..utils import url_for_query
 from ..oauth import github
 
 router = APIRouter()
 
-@router.get("/api/user", response_model=UserOut)
+@router.get('/api/user', response_model=UserOut)
 async def get_user(user: User = Depends(user_from_session)):
     resp = await github.get('user', token=user.access_token)
 
     return resp.json()
 
-@router.get("/api/repos", response_model=List[RepoOut])
+@router.get('/api/repos', response_model=List[RepoOut])
 async def list_repos(user: User = Depends(user_from_session), db: Session = Depends(get_db)):
-    resp = await github.get(user.repos_url, token=user.access_token)
+    resp = await github.get('/user/repos?type=owner', token=user.access_token)
 
     repos = { repo['id']: RepoOut(**repo, webhook_active=False) for repo in resp.json() }
     webhooks = get_webhooks(db, for_repos=[repo.id for repo in repos.values()])
@@ -30,12 +33,12 @@ async def list_repos(user: User = Depends(user_from_session), db: Session = Depe
     return list(repos.values())
 
 
-@router.get("/api/add-webhook/{name}")
-async def add_webhook_for_repo(name: str, repo_id: str, request: Request, user: User = Depends(user_from_session), db: Session = Depends(get_db)):
-    resp = await github.post(f'/repos/{user.login}/{name}/hooks', token=user.access_token, json={
+@router.post('/api/add-webhook')
+async def add_webhook_for_repo(repo: RepoIn, request: Request, user: User = Depends(user_from_session), db: Session = Depends(get_db)):
+    resp = await github.post(repo.hooks_url, token=user.access_token, json={
         'name': 'web',
         'config': {
-            'url': request.url_for('webhook'),
+            'url': url_for_query(request, 'webhook', token=user.access_token['access_token']),
             'content_type': 'json',
             'insecure_ssl': '0'
         },
@@ -49,6 +52,10 @@ async def add_webhook_for_repo(name: str, repo_id: str, request: Request, user: 
     if 'errors' in resp:
         raise HTTPException(status_code=400, detail=resp['errors'][0]['message'])
 
-    add_webhook(db, for_repo=repo_id)
+    add_webhook(db, for_repo=repo.id)
 
     return { 'status': 'ok' }
+
+@router.get('/api/runs', response_model=List[RunOut])
+async def list_runs(user: User = Depends(user_from_session), db: Session = Depends(get_db)):
+    return get_runs(db, for_user=user.id)

@@ -1,16 +1,29 @@
 from pydantic import BaseModel
 
+from .user import User
+
 
 class RepoBase(BaseModel):
     id: str
     name: str
-    webhook_active: bool
+    html_url: str
+    hooks_url: str
 
 
 class Repo(RepoBase):
+    full_name: str
+    ssh_url: str
+    contents_url: str
+    pass
+
+
+class RepoIn(RepoBase):
     pass
 
 
 class RepoOut(RepoBase):
-    pass
+    webhook_active: bool
 
+
+class RepoWithOwner(Repo):
+    owner: User
