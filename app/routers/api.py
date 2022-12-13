@@ -7,8 +7,10 @@ from ..dependencies import user_from_session, get_db
 from ..schemas.user import User, UserOut
 from ..schemas.repo import RepoIn, RepoOut
 from ..schemas.run import RunOut
+from ..schemas.stage import StageOut
 from ..crud.webhook import get_webhooks, add_webhook
-from ..crud.run import get_runs
+from ..crud.run import get_runs, get_run_by_id
+from ..crud.stage import get_stages
 from ..utils import url_for_query
 from ..oauth import github
 
@@ -59,3 +61,12 @@ async def add_webhook_for_repo(repo: RepoIn, request: Request, user: User = Depe
 @router.get('/api/runs', response_model=List[RunOut])
 async def list_runs(user: User = Depends(user_from_session), db: Session = Depends(get_db)):
     return get_runs(db, for_user=user.id)
+
+@router.get('/api/runs/{run_id}/stages', response_model=List[StageOut])
+async def list_stages(run_id: str, user: User = Depends(user_from_session), db: Session = Depends(get_db)):
+    run = get_run_by_id(db, run_id=run_id, for_user=user.id)
+
+    if not run:
+        raise HTTPException(status_code=404, detail=f'run {run_id} not found for user {user.id}')
+
+    return get_stages(db, for_run=run_id)

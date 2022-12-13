@@ -6,6 +6,9 @@ from ..schemas.run import RunIn, RunStatus
 def get_runs(db: Session, for_user: int):
     return db.query(Run).filter(Run.user_id == for_user).all()
 
+def get_run_by_id(db: Session, run_id: int, for_user: int):
+    return db.query(Run).filter(Run.user_id == for_user and Run.id == run_id).first()
+
 def add_run(db: Session, run: RunIn):
     db_run = Run(**run.dict())
     db.add(db_run)

@@ -65,7 +65,7 @@ def build_worker(run: Run, build_finished):
     ))
     waiting_for = checkout_stage.id
 
-    for stage_name, stage in config.stages.values():
+    for stage_name, stage in config.stages.items():
         stage_tag = build_stage(stage_name, stage, config.image)
 
         stage = add_stage(StageIn(
