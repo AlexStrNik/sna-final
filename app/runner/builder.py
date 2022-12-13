@@ -43,17 +43,17 @@ def build_stage(name: str, stage: config.Stage, config_image: str):
 
     return tag
 
-def add_stage(stage: StageIn) -> StageOut:
+def add_stage_(stage: StageIn) -> StageOut:
     with SessionLocal() as db:
         db.expire_on_commit = False
-        return add_stage(stage)
+        return add_stage(db, stage)
 
 def build_worker(run: Run, build_finished):
     config_raw = requests.get(run.config_url, headers={ 'Authorization': f'Bearer {run.token}' }).text
     config = parse_config(config_raw)
 
     waiting_for = -1
-    checkout_stage = add_stage(StageIn(
+    checkout_stage = add_stage_(StageIn(
         run_id=run.id,
         waiting_for=waiting_for,
         name='checkout',
@@ -68,16 +68,17 @@ def build_worker(run: Run, build_finished):
     for stage_name, stage in config.stages.items():
         stage_tag = build_stage(stage_name, stage, config.image)
 
-        stage = add_stage(StageIn(
+        stage = add_stage_(StageIn(
             run_id=run.id,
             waiting_for=waiting_for,
             name=stage_name,
             image_tag=stage_tag,
-            env_vars={}
+            env_vars={},
+            artifacts=stage.artifacts
         ))
         waiting_for = stage.id
 
-    add_stage(StageIn(
+    add_stage_(StageIn(
         run_id=run.id,
         waiting_for=waiting_for,
         name='cleanup',

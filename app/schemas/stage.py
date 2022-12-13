@@ -12,11 +12,10 @@ class StageStatus(str, Enum):
 
 class Stage(BaseModel):
     name: str
-    status: StageStatus
     artifacts: Optional[List[str]]
 
 
-class StageIn(BaseModel):
+class StageIn(Stage):
     run_id: str
     waiting_for: int
     image_tag: str
@@ -24,5 +23,9 @@ class StageIn(BaseModel):
     pass
 
 
-class StageOut(BaseModel):
+class StageOut(Stage):
     id: int
+    status: StageStatus
+
+    class Config:
+        orm_mode = True
