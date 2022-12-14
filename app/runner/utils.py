@@ -18,6 +18,11 @@ def parse_config(config_raw: str):
 
 def build_checkouter():
     try:
-        docker_client.images.get('checkouter')
+        docker_client.images.get(RUNNER_CHECKOUTER_TAG)
     except ImageNotFound:
-        docker_client.images.build(path=path.join(path.dirname(__file__), 'checkouter'), tag=RUNNER_CHECKOUTER_TAG, rm=True, forcerm=True)
+        docker_client.images.build(
+            path=path.join(path.dirname(__file__), 'checkouter'), 
+            tag=RUNNER_CHECKOUTER_TAG, 
+            rm=True, 
+            forcerm=True
+        )

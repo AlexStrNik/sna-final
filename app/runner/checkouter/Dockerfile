@@ -1,7 +1,9 @@
 FROM alpine
 RUN apk add --no-cache git
 
-COPY checkout.sh .
-RUN chmod +x checkout.sh
+COPY ./checkout.sh /.checkout.sh
 
-ENTRYPOINT ["checkout.sh"]
+RUN mkdir sources
+WORKDIR sources
+
+ENTRYPOINT ["/bin/sh", "/.checkout.sh"]

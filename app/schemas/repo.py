@@ -12,7 +12,7 @@ class RepoBase(BaseModel):
 
 class Repo(RepoBase):
     full_name: str
-    ssh_url: str
+    clone_url: str
     contents_url: str
     pass
 

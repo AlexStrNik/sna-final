@@ -30,7 +30,7 @@ def build_stage(name: str, stage: config.Stage, config_image: str):
     dockerfile += f'''
     RUN mkdir sources
     WORKDIR sources
-    ENTRYPOINT ["/bin/bash", "/.steps.sh"]
+    ENTRYPOINT ["/bin/sh", "/.steps.sh"]
     '''
 
     tag = f'{RUNNER_TAG_PREFIX}-{name}-{hashlib.md5(dockerfile.encode("utf-8")).hexdigest()}'
@@ -52,10 +52,10 @@ def build_worker(run: Run, build_finished):
     config_raw = requests.get(run.config_url, headers={ 'Authorization': f'Bearer {run.token}' }).text
     config = parse_config(config_raw)
 
-    stage_order = 1
+    stage_order = len(config.stages.keys())
     cleanup_stage = add_stage_(StageIn(
         run_id=run.id,
-        order=len(config.stages.keys()) + 1,
+        order=stage_order + 1,
         next_stage=-1,
         name='cleanup',
         image_tag=RUNNER_CLEANUP_TAG,
@@ -76,7 +76,7 @@ def build_worker(run: Run, build_finished):
             artifacts=stage.artifacts
         ))
         next_stage = stage.id
-        stage_order += 1
+        stage_order -= 1
 
     add_stage_(StageIn(
         run_id=run.id,
