@@ -6,7 +6,6 @@ from starlette.requests import Request
 from ..dependencies import user_from_session, get_db
 from ..schemas.user import User, UserOut
 from ..schemas.repo import RepoIn, RepoOut
-from ..schemas.run import RunOut
 from ..schemas.stage import StageOut
 from ..crud.webhook import get_webhooks, add_webhook
 from ..crud.run import get_runs, get_run_by_id
@@ -14,15 +13,15 @@ from ..crud.stage import get_stages
 from ..utils import url_for_query
 from ..oauth import github
 
-router = APIRouter()
+router = APIRouter(prefix='/api')
 
-@router.get('/api/user', response_model=UserOut)
+@router.get('/user', response_model=UserOut)
 async def get_user(user: User = Depends(user_from_session)):
     resp = await github.get('user', token=user.access_token)
 
     return resp.json()
 
-@router.get('/api/repos', response_model=List[RepoOut])
+@router.get('/repos', response_model=List[RepoOut])
 async def list_repos(user: User = Depends(user_from_session), db: Session = Depends(get_db)):
     resp = await github.get('/user/repos?type=owner', token=user.access_token)
 
@@ -35,7 +34,7 @@ async def list_repos(user: User = Depends(user_from_session), db: Session = Depe
     return list(repos.values())
 
 
-@router.post('/api/add-webhook')
+@router.post('/add-webhook')
 async def add_webhook_for_repo(repo: RepoIn, request: Request, user: User = Depends(user_from_session), db: Session = Depends(get_db)):
     resp = await github.post(repo.hooks_url, token=user.access_token, json={
         'name': 'web',
@@ -57,16 +56,3 @@ async def add_webhook_for_repo(repo: RepoIn, request: Request, user: User = Depe
     add_webhook(db, for_repo=repo.id)
 
     return { 'status': 'ok' }
-
-@router.get('/api/runs', response_model=List[RunOut])
-async def list_runs(user: User = Depends(user_from_session), db: Session = Depends(get_db)):
-    return get_runs(db, for_user=user.id)
-
-@router.get('/api/runs/{run_id}/stages', response_model=List[StageOut])
-async def list_stages(run_id: str, user: User = Depends(user_from_session), db: Session = Depends(get_db)):
-    run = get_run_by_id(db, run_id=run_id, for_user=user.id)
-
-    if not run:
-        raise HTTPException(status_code=404, detail=f'run {run_id} not found for user {user.id}')
-
-    return get_stages(db, for_run=run_id)

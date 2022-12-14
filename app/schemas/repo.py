@@ -4,7 +4,7 @@ from .user import User
 
 
 class RepoBase(BaseModel):
-    id: str
+    id: int
     name: str
     html_url: str
     hooks_url: str

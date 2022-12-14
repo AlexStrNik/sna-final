@@ -1,5 +1,4 @@
 import os
-import errno
 import shutil
 from os import path
 
@@ -11,7 +10,6 @@ from .docker_client import docker_client
 
 def run_worker(stage: StageInternal, run_finished):
     run_dir = path.join(os.getcwd(), RUNNER_TMP_DIR, str(stage.run_id))
-    artifacts_dir = path.join(os.getcwd(), RUNNER_ARTIFACTS_DIR, str(stage.run_id))
     logs_dir = path.join(os.getcwd(), RUNNER_LOGS_DIR, str(stage.run_id))
 
     if stage.image_tag == RUNNER_CLEANUP_TAG:
@@ -21,7 +19,6 @@ def run_worker(stage: StageInternal, run_finished):
     if stage.image_tag == RUNNER_CHECKOUTER_TAG:
         os.makedirs(run_dir)
         os.makedirs(logs_dir)
-        os.makedirs(artifacts_dir)
 
     container = docker_client.containers.run(
         stage.image_tag,
@@ -41,13 +38,17 @@ def run_worker(stage: StageInternal, run_finished):
     with SessionLocal() as db:
         if status['StatusCode'] == 0:
             if stage.artifacts:
+                artifacts_dir = path.join(os.getcwd(), RUNNER_ARTIFACTS_DIR, str(stage.id))
+                os.makedirs(artifacts_dir)
+
                 for artifact_path in stage.artifacts:
-                    try:
-                        shutil.copytree(path.join(run_dir, artifact_path), path.join(artifacts_dir, artifact_path))
-                    except OSError as exc:
-                        if exc.errno in (errno.ENOTDIR, errno.EINVAL):
-                            shutil.copy(path.join(run_dir, artifact_path), path.join(artifacts_dir, artifact_path))
-                        else: raise
+                    artifact_src = path.join(run_dir, artifact_path)
+                    artifact_dst = path.join(artifacts_dir, artifact_path)
+
+                    if path.isdir(artifact_src):
+                        shutil.make_archive(artifact_dst, 'zip', artifact_src)
+                    else:
+                        shutil.copy(artifact_src, artifact_dst)
 
             set_stage_status(db, status=StageStatus.Success, for_stage_id=stage.id)
             set_stage_status(db, status=StageStatus.Ready, for_stage_id=stage.next_stage)

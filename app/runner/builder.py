@@ -55,6 +55,7 @@ def build_worker(run: Run, build_finished):
     stage_order = len(config.stages.keys())
     cleanup_stage = add_stage_(StageIn(
         run_id=run.id,
+        user_id=run.user_id,
         order=stage_order + 1,
         next_stage=-1,
         name='cleanup',
@@ -68,6 +69,7 @@ def build_worker(run: Run, build_finished):
 
         stage = add_stage_(StageIn(
             run_id=run.id,
+            user_id=run.user_id,
             order=stage_order,
             next_stage=next_stage,
             name=stage_name,
@@ -80,6 +82,7 @@ def build_worker(run: Run, build_finished):
 
     add_stage_(StageIn(
         run_id=run.id,
+        user_id=run.user_id,
         order=0,
         next_stage=next_stage,
         status=StageStatus.Ready,

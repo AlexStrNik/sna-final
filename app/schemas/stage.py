@@ -13,17 +13,17 @@ class StageStatus(str, Enum):
 
 class Stage(BaseModel):
     name: str
-    artifacts: Optional[List[str]]
 
 
 class StageIn(Stage):
+    user_id: int
     next_stage: int
     order: int
     run_id: int
     status: Optional[StageStatus]
     image_tag: str
+    artifacts: Optional[List[str]]
     env_vars: Mapping[str, str]
-    pass
 
 
 class StageOut(Stage):

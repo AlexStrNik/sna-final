@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
-    id: str
+    id: int
     name: str
     avatar_url: str
     html_url: str

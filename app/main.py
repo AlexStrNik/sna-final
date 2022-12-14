@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 
 from .constants import SESSION_SECRET
-from .routers import auth, api, webhook
+from .routers import auth, api, webhook, runs, stages
 from .database import Base, engine
 from .runner.external import check_waiting_runs, chech_ready_stages
 from .runner.utils import build_checkouter
@@ -10,6 +10,8 @@ from .runner.utils import build_checkouter
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 app.include_router(api.router)
+app.include_router(runs.router)
+app.include_router(stages.router)
 app.include_router(auth.router)
 app.include_router(webhook.router)
 

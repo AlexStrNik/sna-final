@@ -7,6 +7,9 @@ from ..schemas.stage import StageIn, StageStatus
 def get_stages(db: Session, for_run: int):
     return db.query(Stage).filter(Stage.run_id == for_run).order_by(Stage.order).all()
 
+def get_stage_by_id(db: Session, stage_id: int, for_user: int):
+    return db.query(Stage).filter(Stage.user_id == for_user, Stage.id == stage_id).first()
+
 def add_stage(db: Session, stage: StageIn):
     db_stage = Stage(**stage.dict())
     db.add(db_stage)
