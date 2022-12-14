@@ -6,10 +6,10 @@ class UserBase(BaseModel):
     id: str
     name: str
     avatar_url: str
+    html_url: str
 
 
 class User(UserBase):
-    login: str
     repos_url: str
     access_token: typing.Any
 
