@@ -1,4 +1,3 @@
-import typing
 from pydantic import BaseModel
 
 
@@ -11,7 +10,7 @@ class UserBase(BaseModel):
 
 class User(UserBase):
     repos_url: str
-    access_token: typing.Any
+    access_token: str
 
 
 class UserOut(UserBase):
