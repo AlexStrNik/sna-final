@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.get('/auth', response_class=HTMLResponse)
 def auth_response(code: str):
-    res = requests.post(f'{GITHUB_API_BASE}', params={
+    res = requests.post(f'{GITHUB_API_BASE}/login/oauth/access_token', params={
         'client_id': GITHUB_CLIENT_ID,
         'client_secret': GITHUB_CLIENT_SECRET,
         'code': code
@@ -23,7 +23,7 @@ def auth_response(code: str):
         close the window.
         <script>
         window.opener.postMessage({
-            'flutter-web-auth': {res['access_token']}
+            'flutter-web-auth': {res.get('access_token', 'error')}
         }, '*');
         window.close();
         </script>
