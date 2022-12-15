@@ -9,7 +9,7 @@ close the window.
 <script>
   window.opener.postMessage({
     'flutter-web-auth': window.location.href
-  }, window.location.origin);
+  }, '*');
   window.close();
 </script>
 """
