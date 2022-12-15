@@ -1,17 +1,16 @@
-import requests
-from fastapi import HTTPException, Header
+from fastapi import HTTPException
+from starlette.requests import Request
+from sqlalchemy.orm import Session
 
-from .constants import GITHUB_API_BASE
+from .models import *
 from .database import SessionLocal
 from .schemas.user import User
 
-def user_from_token(token: str = Header()):
-    user = requests.get(f'{GITHUB_API_BASE}/user', headers={ 'Authorization': f'Bearer {token}' }).json()
-
-    if not 'id' in user:
+def user_from_session(request: Request):
+    if not 'user' in request.session:
         raise HTTPException(status_code=403, detail='not authenticated')
 
-    return User(**user, access_token=token)
+    return User(**request.session['user'])
 
 
 def get_db():

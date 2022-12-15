@@ -1,7 +1,7 @@
-import requests
 from fastapi import APIRouter, HTTPException, Header, Depends
 from sqlalchemy.orm import Session
 
+from ..oauth import github
 from ..constants import RUNNER_CONFIG_NAME
 from ..schemas.run import RunIn
 from ..crud.run import add_run
@@ -26,14 +26,14 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
 
     config_url = f'{event.repository.contents_url.replace("{+path}", RUNNER_CONFIG_NAME)}?ref={event.head_commit.id}'
     
-    config_info = requests.get(config_url, headers={ 'Authorization': f'Bearer {access_token}' })
+    config_info = await github.get(config_url, token=access_token)
     config_info = config_info.json()
 
     if 'message' in config_info and config_info['message'] == 'Not Found':
         raise HTTPException(status_code=400, detail=f'skipping event, {RUNNER_CONFIG_NAME} not found in repo')
 
     download_url = config_info['download_url']
-    config = requests.get(download_url, headers={ 'Authorization': f'Bearer {access_token}' })
+    config = await github.get(download_url, token=access_token)
     try:
         config = parse_config(config.text)
     except Exception as full_detail:
