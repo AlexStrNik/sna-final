@@ -16,15 +16,15 @@ def auth_response(code: str):
         'Accept': 'application/json'
     }).json()
 
-    return f"""
-        <!DOCTYPE html>
-        <title>Authentication complete</title>
-        <p>Authentication is complete. If this does not happen automatically, please
-        close the window.
-        <script>
-        window.opener.postMessage({
-            'flutter-web-auth': {res.get('access_token', 'error')}
-        }, '*');
-        window.close();
-        </script>
-    """
+    return (
+        "<!DOCTYPE html>"
+        "<title>Authentication complete</title>"
+        "<p>Authentication is complete. If this does not happen automatically, please"
+        "close the window."
+        "<script>"
+        "window.opener.postMessage({"
+        f"    'flutter-web-auth': {res.get('access_token', 'error')}"
+        "}, '*');"
+        "window.close();"
+        "</script>"
+    )
