@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import HTMLResponse
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuthError
@@ -14,20 +13,7 @@ async def login_via_github(request: Request):
     redirect_uri = request.url_for('auth_via_github')
     return await github.authorize_redirect(request, redirect_uri)
 
-AUTH_RESPONSE = """
-<!DOCTYPE html>
-<title>Authentication complete</title>
-<p>Authentication is complete. If this does not happen automatically, please
-close the window.
-<script>
-  window.opener.postMessage({
-    'flutter-web-auth': 'success'
-  }, window.location.origin);
-  window.close();
-</script>
-"""
-
-@router.get('/auth/github', response_class=HTMLResponse)
+@router.get('/auth/github')
 async def auth_via_github(request: Request):
     token = None
     try:
@@ -43,4 +29,4 @@ async def auth_via_github(request: Request):
         access_token=token,
     ).dict()
 
-    return AUTH_RESPONSE
+    return RedirectResponse('/')
