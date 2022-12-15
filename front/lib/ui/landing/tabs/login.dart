@@ -1,9 +1,11 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:front/ui/common/on_drag_widget.dart';
+import 'package:front/constants/utils.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +39,8 @@ class LoginScreen extends StatelessWidget {
                   'FAQ',
                   style: Theme.of(context)
                       .textTheme
-                      .caption
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w400),
                 ),
               ),
               TextButton(
@@ -47,8 +49,8 @@ class LoginScreen extends StatelessWidget {
                   'Docs',
                   style: Theme.of(context)
                       .textTheme
-                      .caption
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w400),
                 ),
               ),
               TextButton(
@@ -57,8 +59,8 @@ class LoginScreen extends StatelessWidget {
                   'Integration',
                   style: Theme.of(context)
                       .textTheme
-                      .caption
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w400),
                 ),
               ),
               TextButton(
@@ -67,27 +69,19 @@ class LoginScreen extends StatelessWidget {
                   'Pricing',
                   style: Theme.of(context)
                       .textTheme
-                      .caption
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                      .bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w400),
                 ),
               ),
               const Spacer(),
               TextButton(
-                onPressed: () {},
+                onPressed: () async => await Utils.launchLogin(),
                 child: Text(
-                  'Sign Up',
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w900, color: Colors.grey),
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Login',
+                  'Login via Github',
                   style: Theme.of(context)
                       .textTheme
                       .titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w900),
+                      ?.copyWith(fontWeight: FontWeight.w400),
                 ),
               ),
             ],
@@ -95,21 +89,51 @@ class LoginScreen extends StatelessWidget {
           const SizedBox(height: 40),
           Stack(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: Theme.of(context).primaryColor.withOpacity(0.1),
-                    borderRadius: const BorderRadius.all(Radius.circular(14))),
-                width: MediaQuery.of(context).size.width,
-                height: 240,
+              Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.35),
+                child: Center(
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color:
+                              Theme.of(context).primaryColor.withOpacity(0.2),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(14))),
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      height: 240,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.30),
+                child: const Center(
+                  child: OnDragWidget(),
+                ),
               ),
               Center(
                 child: RichText(
                   textAlign: TextAlign.center,
                   text: TextSpan(
-                    text: '\nYour DevOps Team ',
-                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.w900, color: Colors.black),
+                    text:
+                        '\nautomate merge, deploy and release routine operations'
+                            .toUpperCase(),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(color: Colors.indigo),
                     children: [
+                      TextSpan(
+                        text: '\nYour DevOps Team ',
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineLarge
+                            ?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black),
+                      ),
                       const WidgetSpan(
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 4.0),
@@ -126,8 +150,8 @@ class LoginScreen extends StatelessWidget {
                             .textTheme
                             .headlineLarge
                             ?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: Colors.black),
+                                fontWeight: FontWeight.w900,
+                                color: Colors.black),
                       ),
                       TextSpan(
                         text: '\nbut it ',
@@ -158,17 +182,27 @@ class LoginScreen extends StatelessWidget {
                                 color: Colors.black),
                       ),
                       TextSpan(
-                        text: 'Say ',
+                        text: 'Say  ',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
-                      TextSpan(
-                          text: ' @betterRultor hello ',
+                      WidgetSpan(
+                        child: DefaultTextStyle(
                           style: Theme.of(context)
                               .textTheme
-                              .bodyLarge
-                              ?.copyWith(
+                              .bodyLarge!
+                              .copyWith(
                                   backgroundColor: Colors.black,
-                                  color: Colors.white)),
+                                  color: Colors.white),
+                          child: AnimatedTextKit(
+                              isRepeatingAnimation: true,
+                              animatedTexts: [
+                                TyperAnimatedText(
+                                  ' @betterRultor hello ',
+                                  speed: const Duration(milliseconds: 100),
+                                ),
+                              ]),
+                        ),
+                      ),
                       TextSpan(
                           text: ' in a Github issue and start from there.',
                           style: Theme.of(context).textTheme.bodyLarge),
@@ -177,7 +211,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               )
             ],
-          )
+          ),
         ],
       ),
     );
