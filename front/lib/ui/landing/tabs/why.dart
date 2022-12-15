@@ -1,9 +1,7 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:front/ui/common/on_drag_widget.dart';
 
-class FAQTab extends StatelessWidget {
-  const FAQTab({Key? key}) : super(key: key);
+class WhyTab extends StatelessWidget {
+  const WhyTab({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -13,19 +11,14 @@ class FAQTab extends StatelessWidget {
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            text: '\nINTEGRATIONS',
+            text: '\nwhy not original rultor?'.toUpperCase(),
             style: Theme.of(context)
                 .textTheme
                 .bodyLarge
-                ?.copyWith(color: Colors.deepPurpleAccent),
+                ?.copyWith(color: Colors.redAccent),
             children: [
               TextSpan(
-                text: '\nIntegrations to\n',
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.w900, color: Colors.black),
-              ),
-              TextSpan(
-                text: 'power ',
+                text: '\nRultor solution ',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.w900, color: Colors.black),
               ),
@@ -33,14 +26,14 @@ class FAQTab extends StatelessWidget {
                 child: Padding(
                   padding: EdgeInsets.only(bottom: 4.0),
                   child: Icon(
-                    Icons.alt_route_rounded,
+                    Icons.block_rounded,
                     size: 32.0,
-                    color: Colors.deepPurpleAccent,
+                    color: Colors.redAccent,
                   ),
                 ),
               ),
               TextSpan(
-                text: ' your development\n',
+                text: ' sucks.',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     fontWeight: FontWeight.w900, color: Colors.black),
               ),

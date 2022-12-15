@@ -52,7 +52,7 @@ class _OnDragWidgetState extends State<OnDragWidget> {
         child: Stack(
           children: [
             Container(
-              height: 45,
+              height: 55,
               decoration: BoxDecoration(
                 color: amIHovering
                     ? Theme.of(context).primaryColor.withOpacity(0.1)
@@ -100,7 +100,7 @@ class _OnDragWidgetState extends State<OnDragWidget> {
                       height: 200,
                       width: MediaQuery.of(context).size.width * 0.12,
                       child: OnTapOpacityContainer(
-                        onTap: () async => await Utils.launchLogin(),
+                        onTap: () async => await Utils.launchDocs(),
                         curve: Curves.ease,
                         child: ClipPath(
                           clipper: BackgroundClipper(),

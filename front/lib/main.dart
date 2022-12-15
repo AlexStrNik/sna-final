@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'ui/landing/tabs/login.dart';
+import 'package:front/ui/landing/landing.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +15,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.blueAccent,
         primarySwatch: Colors.blue,
       ),
-      home: const LoginScreen(),
+      home: const LandingScreen(),
     );
   }
 }
