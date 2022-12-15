@@ -16,6 +16,8 @@ def auth_response(code: str):
         'Accept': 'application/json'
     }).json()
 
+    print(res)
+
     return (
         "<!DOCTYPE html>"
         "<title>Authentication complete</title>"
@@ -23,7 +25,7 @@ def auth_response(code: str):
         "close the window."
         "<script>"
         "window.opener.postMessage({"
-        f"    'flutter-web-auth': {res.get('access_token', 'error')}"
+        f"    'flutter-web-auth': '{res.get('access_token', 'error')}'"
         "}, '*');"
         "window.close();"
         "</script>"
