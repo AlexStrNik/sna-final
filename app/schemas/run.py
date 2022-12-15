@@ -3,9 +3,9 @@ from pydantic import BaseModel
 
 
 class RunStatus(str, Enum):
-    Waiting = 'waiting',
-    Running = 'running',
-    Failed = 'failed',
+    Waiting = 'waiting'
+    Running = 'running'
+    Failed = 'failed'
     Success = 'success'
 
 

@@ -4,23 +4,26 @@ from pydantic import BaseModel
 
 
 class StageStatus(str, Enum):
-    Waiting = 'waiting',
-    Running = 'running',
-    Failed = 'failed',
+    Ready = 'ready'
+    Waiting = 'waiting'
+    Running = 'running'
+    Failed = 'failed'
     Success = 'success'
 
 
 class Stage(BaseModel):
     name: str
-    artifacts: Optional[List[str]]
 
 
 class StageIn(Stage):
-    run_id: str
-    waiting_for: int
+    user_id: int
+    next_stage: int
+    order: int
+    run_id: int
+    status: Optional[StageStatus]
     image_tag: str
+    artifacts: Optional[List[str]]
     env_vars: Mapping[str, str]
-    pass
 
 
 class StageOut(Stage):
@@ -29,3 +32,6 @@ class StageOut(Stage):
 
     class Config:
         orm_mode = True
+
+class StageInternal(StageIn, StageOut):
+    pass

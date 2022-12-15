@@ -7,7 +7,7 @@ from ..schemas.run import RunIn
 from ..crud.run import add_run
 from ..schemas.webhook_event import EventPushed
 from ..runner.utils import parse_config
-from ..runner.runner import start_builder
+from ..runner.external import start_builder
 from ..dependencies import get_db
 
 router = APIRouter()
@@ -49,7 +49,7 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
         commit_id=event.head_commit.id,
         commit_message=event.head_commit.message,
         commit_url=event.head_commit.url,
-        clone_url=event.repository.ssh_url.replace('git@github', f'{token}@github'),
+        clone_url=event.repository.clone_url.replace('github.com', f'{token}@github.com', 1),
         config_url=download_url,
         token=token
     ))

@@ -4,7 +4,7 @@ from .user import User
 
 
 class RepoBase(BaseModel):
-    id: str
+    id: int
     name: str
     html_url: str
     hooks_url: str
@@ -12,7 +12,7 @@ class RepoBase(BaseModel):
 
 class Repo(RepoBase):
     full_name: str
-    ssh_url: str
+    clone_url: str
     contents_url: str
     pass
 

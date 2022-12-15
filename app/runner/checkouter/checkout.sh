@@ -1,5 +1,2 @@
-#!/bin/bash
-
-git clone $REPO_URL sources
-cd sources
+git clone $REPO_URL .
 git checkout $COMMIT_ID

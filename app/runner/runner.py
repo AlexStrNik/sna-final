@@ -1,42 +1,58 @@
-from threading import Thread
+import os
+import shutil
+from os import path
 
-from ..constants import RUNNER_MAX_WORKERS, RUNNER_MAX_BUILDERS
 from ..database import SessionLocal
-from ..schemas.run import RunStatus
-from ..crud.run import get_next_run
-from .builder import build_worker
+from ..constants import RUNNER_CHECKOUTER_TAG, RUNNER_CLEANUP_TAG, RUNNER_TMP_DIR, RUNNER_LOGS_DIR, RUNNER_ARTIFACTS_DIR
+from ..schemas.stage import StageInternal, StageStatus
+from ..crud.stage import set_stage_status
+from .docker_client import docker_client
 
-current_workers = 0
-current_builders = 0
+def run_worker(stage: StageInternal, run_finished):
+    run_dir = path.join(os.getcwd(), RUNNER_TMP_DIR, str(stage.run_id))
+    logs_dir = path.join(os.getcwd(), RUNNER_LOGS_DIR, str(stage.run_id))
 
-def start_builder():
-    global current_builders
-
-    if current_builders >= RUNNER_MAX_BUILDERS:
+    if stage.image_tag == RUNNER_CLEANUP_TAG:
+        shutil.rmtree(run_dir)
         return
 
-    run = None
+    if stage.image_tag == RUNNER_CHECKOUTER_TAG:
+        os.makedirs(run_dir)
+        os.makedirs(logs_dir)
+
+    container = docker_client.containers.run(
+        stage.image_tag,
+        detach=True,
+        volumes={ run_dir: { 'bind': '/sources', 'mode': 'rw' } },
+        environment=stage.env_vars
+    )
+
+    with open(path.join(logs_dir, f'{stage.name}.log'), 'wb') as log:
+        for log_line in container.logs(stream=True, stdout=True, stderr=True):
+            log.write(log_line)
+            log.flush()
+
+    status = container.wait()
+    container.remove()
+
     with SessionLocal() as db:
-        db.expire_on_commit = False
-        run = get_next_run(db)
+        if status['StatusCode'] == 0:
+            if stage.artifacts:
+                artifacts_dir = path.join(os.getcwd(), RUNNER_ARTIFACTS_DIR, str(stage.id))
+                os.makedirs(artifacts_dir)
 
-        if run == None:
-            return
+                for artifact_path in stage.artifacts:
+                    artifact_src = path.join(run_dir, artifact_path)
+                    artifact_dst = path.join(artifacts_dir, artifact_path)
 
-        run.status = RunStatus.Running
-        db.commit()
+                    if path.isdir(artifact_src):
+                        shutil.make_archive(artifact_dst, 'zip', artifact_src)
+                    else:
+                        shutil.copy(artifact_src, artifact_dst)
 
-    current_builders += 1
+            set_stage_status(db, status=StageStatus.Success, for_stage_id=stage.id)
+            set_stage_status(db, status=StageStatus.Ready, for_stage_id=stage.next_stage)
+        else:
+            set_stage_status(db, status=StageStatus.Failed, for_stage_id=stage.id)
 
-    builder_thread = Thread(target=build_worker, args=(run, build_finished))
-    builder_thread.start()
-
-def build_finished():
-    global current_builders
-
-    current_builders -= 1
-    start_builder()
-
-def check_waiting_runs():
-    for _ in range(RUNNER_MAX_BUILDERS):
-        start_builder()
+    run_finished()
