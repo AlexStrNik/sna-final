@@ -6,6 +6,7 @@ from docker.errors import ImageNotFound
 
 from ..constants import RUNNER_CHECKOUTER_TAG, RUNNER_TAG_PREFIX, RUNNER_CLEANUP_TAG
 from ..schemas.stage import StageIn, StageOut, StageStatus
+from ..crud.repo_settings import get_settings
 from ..crud.stage import add_stage
 from ..schemas import config
 from ..models.run import Run
@@ -52,6 +53,14 @@ def build_worker(run: Run, build_finished):
     config_raw = requests.get(run.config_url, headers={ 'Authorization': f'Bearer {run.token}' }).text
     config = parse_config(config_raw)
 
+    env_vars = {
+        'GH_TOKEN': run.token,
+    }
+
+    with SessionLocal() as db:
+        settings = get_settings(db, for_repo=run.repo_id)
+        env_vars = settings.env_vars
+
     stage_order = len(config.stages.keys())
     cleanup_stage = add_stage_(StageIn(
         run_id=run.id,
@@ -60,7 +69,7 @@ def build_worker(run: Run, build_finished):
         next_stage=-1,
         name='cleanup',
         image_tag=RUNNER_CLEANUP_TAG,
-        env_vars={}
+        env_vars=env_vars
     ))
     next_stage = cleanup_stage.id
 
@@ -74,7 +83,7 @@ def build_worker(run: Run, build_finished):
             next_stage=next_stage,
             name=stage_name,
             image_tag=stage_tag,
-            env_vars={},
+            env_vars=env_vars,
             artifacts=stage.artifacts
         ))
         next_stage = stage.id
@@ -90,7 +99,8 @@ def build_worker(run: Run, build_finished):
         image_tag=RUNNER_CHECKOUTER_TAG,
         env_vars={
             'REPO_URL': run.clone_url,
-            'COMMIT_ID': run.commit_id
+            'COMMIT_ID': run.commit_id,
+            **env_vars
         },
     ))
     

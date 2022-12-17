@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import auth, api, webhook, runs, stages
+from .routers import auth, user, webhook, runs, stages, repos
 from .database import Base, engine
 from .runner.external import check_waiting_runs, chech_ready_stages
 from .runner.utils import build_checkouter
@@ -18,7 +18,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api.router)
+app.include_router(user.router)
+app.include_router(repos.router)
 app.include_router(runs.router)
 app.include_router(stages.router)
 app.include_router(auth.router)

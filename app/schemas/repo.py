@@ -1,3 +1,4 @@
+from typing import Mapping
 from pydantic import BaseModel
 
 from .user import User
@@ -23,6 +24,7 @@ class RepoIn(RepoBase):
 
 class RepoOut(RepoBase):
     webhook_active: bool
+    env_vars: Mapping[str, str]
 
 
 class RepoWithOwner(Repo):
