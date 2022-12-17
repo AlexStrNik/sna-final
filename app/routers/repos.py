@@ -9,8 +9,7 @@ from ..constants import GITHUB_API_BASE
 from ..dependencies import user_from_token, get_db
 from ..crud.repo_settings import get_settings, set_settings
 from ..schemas.user import User
-from ..schemas.repo import RepoOut
-from ..schemas.repo_settings import RepoSettings
+from ..schemas.repo import RepoOut, RepoWithLanguages
 
 router = APIRouter(prefix='/api/repos')
 
@@ -27,11 +26,15 @@ async def list_repos(user: User = Depends(user_from_token), db: Session = Depend
 
     return list(repos.values())
 
-@router.get('/{repo_id}', response_model=RepoOut)
+@router.get('/{repo_id}', response_model=RepoWithLanguages)
 def get_repo(repo_id: int, user: User = Depends(user_from_token), db: Session = Depends(get_db)):
     resp = requests.get(f'{GITHUB_API_BASE}/repositories/{repo_id}', headers={ 'Authorization': f'Bearer {user.access_token}' })
     repo = resp.json()
-    repo = RepoOut(**repo, webhook_active=False, env_vars={})
+
+    languages = requests.get(repo['languages_url'], headers={ 'Authorization': f'Bearer {user.access_token}' })
+    languages = languages.json()
+
+    repo = RepoWithLanguages(**repo, languages=languages, webhook_active=False, env_vars={})
 
     settings = get_settings(db, for_repo=repo.id)
 

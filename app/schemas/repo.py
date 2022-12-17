@@ -29,3 +29,7 @@ class RepoOut(RepoBase):
 
 class RepoWithOwner(Repo):
     owner: User
+
+
+class RepoWithLanguages(RepoOut):
+    languages: Mapping[str, int]
