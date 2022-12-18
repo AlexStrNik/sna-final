@@ -10,6 +10,7 @@ from ..dependencies import user_from_token, get_db
 from ..crud.repo_settings import get_settings, set_settings
 from ..crud.run import get_runs
 from ..schemas.user import User
+from ..schemas.run import RunOut
 from ..schemas.repo import RepoOut, RepoWithLanguages
 
 router = APIRouter(prefix='/api/repos')
@@ -46,9 +47,9 @@ def get_repo(repo_id: int, user: User = Depends(user_from_token), db: Session = 
         repo.env_vars = settings.env_vars
         repo.webhook_active = settings.webhook_active
 
-    return get_runs(db, for_repo=repo_id)
+    return repo
 
-@router.get('/{repo_id}/runs')
+@router.get('/{repo_id}/runs', response_model=List[RunOut])
 async def get_runs_for_repo(repo_id: int, user: User = Depends(user_from_token), db: Session = Depends(get_db)):
     resp = requests.get(f'{GITHUB_API_BASE}/repositories/{repo_id}', headers={ 'Authorization': f'Bearer {user.access_token}' })
     repo = resp.json()
@@ -56,7 +57,7 @@ async def get_runs_for_repo(repo_id: int, user: User = Depends(user_from_token),
     if repo['owner']['id'] != user.id:
         raise HTTPException(status_code=403, detail='not authorized')
 
-    return get
+    return get_runs(db, for_repo=repo_id)
 
 @router.post('/{repo_id}/add-webhook')
 async def add_webhook_for_repo(repo_id: int, request: Request, user: User = Depends(user_from_token), db: Session = Depends(get_db)):
