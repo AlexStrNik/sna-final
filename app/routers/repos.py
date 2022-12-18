@@ -16,7 +16,7 @@ router = APIRouter(prefix='/api/repos')
 
 @router.get('/', response_model=List[RepoOut])
 async def list_repos(user: User = Depends(user_from_token), db: Session = Depends(get_db)):
-    resp = requests.get(f'{GITHUB_API_BASE}/user/repos?type=owner', headers={ 'Authorization': f'Bearer {user.access_token}' })
+    resp = requests.get(f'{GITHUB_API_BASE}/user/repos?type=owner&sort=created&per_page=100', headers={ 'Authorization': f'Bearer {user.access_token}' })
 
     repos = { repo['id']: RepoOut(**repo, webhook_active=False, env_vars={}) for repo in resp.json() }
     settings = get_settings(db, for_repos=[repo.id for repo in repos.values()])
