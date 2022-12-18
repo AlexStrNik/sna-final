@@ -2,7 +2,7 @@ from typing import Mapping
 from datetime import datetime
 from pydantic import BaseModel
 
-from .user import User
+from .user import UserBase
 
 
 class RepoBase(BaseModel):
@@ -33,7 +33,7 @@ class RepoOut(RepoBase):
 
 
 class RepoWithOwner(Repo):
-    owner: User
+    owner: UserBase
 
 
 class RepoWithLanguages(RepoOut):
