@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import update
 
 from ..models.run import Run
 from ..schemas.run import RunIn, RunStatus
@@ -22,3 +23,11 @@ def add_run(db: Session, run: RunIn):
 
 def get_next_run(db: Session):
     return db.query(Run).filter(Run.status == RunStatus.Waiting).first()
+
+def set_run_status(db: Session, status: RunStatus, for_run_id: int):
+    db.execute(
+        update(Run).where(Run.id == for_run_id).values(status = status)
+    )
+    db.commit()
+
+    return True
