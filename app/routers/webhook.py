@@ -45,7 +45,7 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
     add_run(db, RunIn(
         user_id=event.repository.owner.id,
         repo_id=event.repository.id,
-        repo_name=event.repository.name,
+        branch_name=branch_name,
         commit_id=event.head_commit.id,
         commit_message=event.head_commit.message,
         commit_url=event.head_commit.url,

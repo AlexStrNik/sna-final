@@ -55,6 +55,7 @@ def build_worker(run: Run, build_finished):
 
     env_vars = {
         'GH_TOKEN': run.token,
+        'BRANCH_NAME': run.branch_name,
     }
 
     with SessionLocal() as db:

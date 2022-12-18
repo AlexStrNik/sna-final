@@ -11,7 +11,7 @@ class Run(Base):
     status = Column(Enum(RunStatus), default=RunStatus.Waiting)
     user_id = Column(Integer)
     repo_id = Column(Integer)
-    repo_name = Column(String)
+    branch_name = Column(String)
     commit_id = Column(String)
     commit_url = Column(String)
     commit_message = Column(String)

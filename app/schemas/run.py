@@ -12,7 +12,7 @@ class RunStatus(str, Enum):
 class RunBase(BaseModel):
     user_id: int
     repo_id: int
-    repo_name: str
+    branch_name: str
     commit_id: str
     commit_url: str
     commit_message: str
