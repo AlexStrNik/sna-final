@@ -4,6 +4,9 @@ from pydantic import BaseModel
 
 from .user import UserBase
 
+def convert_datetime(dt: datetime) -> str:
+    return dt.strftime('%d/%m/%Y')
+
 
 class RepoBase(BaseModel):
     id: int
@@ -14,6 +17,11 @@ class RepoBase(BaseModel):
     pushed_at: datetime
     stargazers_count: int
     watchers_count: int
+
+    class Config:
+        json_encoders = {
+            datetime: convert_datetime
+        }
 
 
 class Repo(RepoBase):
