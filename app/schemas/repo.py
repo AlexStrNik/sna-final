@@ -1,4 +1,5 @@
 from typing import Mapping
+from datetime import datetime
 from pydantic import BaseModel
 
 from .user import User
@@ -9,6 +10,10 @@ class RepoBase(BaseModel):
     name: str
     html_url: str
     hooks_url: str
+    created_at: datetime
+    pushed_at: datetime
+    stargazers_count: int
+    watchers_count: int
 
 
 class Repo(RepoBase):
