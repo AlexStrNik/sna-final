@@ -70,6 +70,7 @@ branches:
   - main
 """
 
+
 class TestParser(unittest.TestCase):
     def test_image_resolving(self):
         config = parse_config(VALID_CONFIG)
