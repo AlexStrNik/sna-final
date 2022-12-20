@@ -12,15 +12,11 @@ from ..schemas import config
 from ..models.run import Run
 from ..database import SessionLocal
 from .docker_client import docker_client
-from .utils import parse_config
+from .parser import parse_config
 
-def build_stage(name: str, stage: config.Stage, config_image: str):
-    image = stage.image
-    if not image:
-        image = config_image
-
+def build_stage(name: str, stage: config.Stage):
     dockerfile = f'''
-    FROM {image}
+    FROM {stage.image}
     
     RUN touch .steps.sh
     '''

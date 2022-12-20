@@ -6,7 +6,7 @@ from ..constants import RUNNER_CONFIG_NAME
 from ..schemas.run import RunIn
 from ..crud.run import add_run
 from ..schemas.webhook_event import EventPushed
-from ..runner.utils import parse_config
+from ..runner.parser import parse_config
 from ..runner.external import start_builder
 from ..dependencies import get_db
 

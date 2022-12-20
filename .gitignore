@@ -1,4 +1,5 @@
 .env
 **/__pycache__
+**/*.pyc
 sql_app.db
 dumb-ci-*
