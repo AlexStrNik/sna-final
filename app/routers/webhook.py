@@ -6,7 +6,7 @@ from ..constants import RUNNER_CONFIG_NAME
 from ..schemas.run import RunIn
 from ..crud.run import add_run
 from ..schemas.webhook_event import EventPushed
-from ..runner.utils import parse_config
+from ..runner.parser import parse_config
 from ..runner.external import start_builder
 from ..dependencies import get_db
 
@@ -17,8 +17,6 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
     if x_github_event != 'push':
         raise HTTPException(status_code=400, detail='skipping event, only push are supported for now')
 
-    access_token = { 'access_token': token, 'type': 'bearer' }
-
     if not event.ref.startswith('refs/heads/'):
         raise HTTPException(status_code=400, detail='skipping event, only branches are supported for now')
     
@@ -26,14 +24,14 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
 
     config_url = f'{event.repository.contents_url.replace("{+path}", RUNNER_CONFIG_NAME)}?ref={event.head_commit.id}'
     
-    config_info = requests.get(config_url, headers={ 'Authorization': f'Bearer {access_token}' })
+    config_info = requests.get(config_url, headers={ 'Authorization': f'Bearer {token}' })
     config_info = config_info.json()
 
     if 'message' in config_info and config_info['message'] == 'Not Found':
         raise HTTPException(status_code=400, detail=f'skipping event, {RUNNER_CONFIG_NAME} not found in repo')
 
     download_url = config_info['download_url']
-    config = requests.get(download_url, headers={ 'Authorization': f'Bearer {access_token}' })
+    config = requests.get(download_url, headers={ 'Authorization': f'Bearer {token}' })
     try:
         config = parse_config(config.text)
     except Exception as full_detail:
@@ -45,7 +43,7 @@ async def webhook(token: str, event: EventPushed, x_github_event: str = Header()
     add_run(db, RunIn(
         user_id=event.repository.owner.id,
         repo_id=event.repository.id,
-        repo_name=event.repository.name,
+        branch_name=branch_name,
         commit_id=event.head_commit.id,
         commit_message=event.head_commit.message,
         commit_url=event.head_commit.url,

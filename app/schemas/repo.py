@@ -1,7 +1,11 @@
 from typing import Mapping
+from datetime import datetime
 from pydantic import BaseModel
 
-from .user import User
+from .user import UserBase
+
+def convert_datetime(dt: datetime) -> str:
+    return dt.strftime('%d/%m/%Y')
 
 
 class RepoBase(BaseModel):
@@ -9,6 +13,15 @@ class RepoBase(BaseModel):
     name: str
     html_url: str
     hooks_url: str
+    created_at: datetime
+    pushed_at: datetime
+    stargazers_count: int
+    watchers_count: int
+
+    class Config:
+        json_encoders = {
+            datetime: convert_datetime
+        }
 
 
 class Repo(RepoBase):
@@ -28,7 +41,7 @@ class RepoOut(RepoBase):
 
 
 class RepoWithOwner(Repo):
-    owner: User
+    owner: UserBase
 
 
 class RepoWithLanguages(RepoOut):

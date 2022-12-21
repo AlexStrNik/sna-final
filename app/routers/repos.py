@@ -8,14 +8,16 @@ from ..utils import url_for_query
 from ..constants import GITHUB_API_BASE
 from ..dependencies import user_from_token, get_db
 from ..crud.repo_settings import get_settings, set_settings
+from ..crud.run import get_runs
 from ..schemas.user import User
+from ..schemas.run import RunOut
 from ..schemas.repo import RepoOut, RepoWithLanguages
 
 router = APIRouter(prefix='/api/repos')
 
 @router.get('/', response_model=List[RepoOut])
 async def list_repos(user: User = Depends(user_from_token), db: Session = Depends(get_db)):
-    resp = requests.get(f'{GITHUB_API_BASE}/user/repos?type=owner', headers={ 'Authorization': f'Bearer {user.access_token}' })
+    resp = requests.get(f'{GITHUB_API_BASE}/user/repos?type=owner&sort=created&per_page=100', headers={ 'Authorization': f'Bearer {user.access_token}' })
 
     repos = { repo['id']: RepoOut(**repo, webhook_active=False, env_vars={}) for repo in resp.json() }
     settings = get_settings(db, for_repos=[repo.id for repo in repos.values()])
@@ -31,6 +33,9 @@ def get_repo(repo_id: int, user: User = Depends(user_from_token), db: Session = 
     resp = requests.get(f'{GITHUB_API_BASE}/repositories/{repo_id}', headers={ 'Authorization': f'Bearer {user.access_token}' })
     repo = resp.json()
 
+    if repo['owner']['id'] != user.id:
+        raise HTTPException(status_code=403, detail='not authorized')
+
     languages = requests.get(repo['languages_url'], headers={ 'Authorization': f'Bearer {user.access_token}' })
     languages = languages.json()
 
@@ -43,6 +48,16 @@ def get_repo(repo_id: int, user: User = Depends(user_from_token), db: Session = 
         repo.webhook_active = settings.webhook_active
 
     return repo
+
+@router.get('/{repo_id}/runs', response_model=List[RunOut])
+async def get_runs_for_repo(repo_id: int, user: User = Depends(user_from_token), db: Session = Depends(get_db)):
+    resp = requests.get(f'{GITHUB_API_BASE}/repositories/{repo_id}', headers={ 'Authorization': f'Bearer {user.access_token}' })
+    repo = resp.json()
+
+    if repo['owner']['id'] != user.id:
+        raise HTTPException(status_code=403, detail='not authorized')
+
+    return get_runs(db, for_repo=repo_id)
 
 @router.post('/{repo_id}/add-webhook')
 async def add_webhook_for_repo(repo_id: int, request: Request, user: User = Depends(user_from_token), db: Session = Depends(get_db)):

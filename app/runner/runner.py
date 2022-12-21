@@ -5,7 +5,9 @@ from os import path
 from ..database import SessionLocal
 from ..constants import RUNNER_CHECKOUTER_TAG, RUNNER_CLEANUP_TAG, RUNNER_TMP_DIR, RUNNER_LOGS_DIR, RUNNER_ARTIFACTS_DIR
 from ..schemas.stage import StageInternal, StageStatus
+from ..schemas.run import RunStatus
 from ..crud.stage import set_stage_status
+from ..crud.run import set_run_status
 from .docker_client import docker_client
 
 def run_worker(stage: StageInternal, run_finished):
@@ -14,6 +16,11 @@ def run_worker(stage: StageInternal, run_finished):
 
     if stage.image_tag == RUNNER_CLEANUP_TAG:
         shutil.rmtree(run_dir)
+
+        with SessionLocal() as db:
+            set_stage_status(db, status=StageStatus.Success, for_stage_id=stage.id)
+            set_run_status(db, status=RunStatus.Success, for_run_id=stage.run_id)
+
         return
 
     if stage.image_tag == RUNNER_CHECKOUTER_TAG:
